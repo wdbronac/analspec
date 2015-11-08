@@ -51,11 +51,35 @@ end
 fft_axis = (1:(points_by_sample / 2));
 fft_frequencies = frequence / 2 * linspace(0, 1, points_by_sample / 2);
 
+
+% with mylevinsondurbin
+
+
+
+levinson = zeros(nb_samples, points_by_sample);
+
+for i = 1:nb_samples
+
+[aa, sigma2, ref, ff, mydsp] = mylevinsondurbin (samples(i, :)', pp, fe);
+ffts(i, :) = mydsp;
+% keep only the positive frequencies
+mydsp = mydsp(find(ff>0)); 
+fft_frequencies  = ff(find(ff>0));
+    
+    
+end
+% fft_axis = (1:(points_by_sample / 2));
+% fft_frequencies = frequence / 2 * linspace(0, 1, points_by_sample / 2);
+
+
+
+
+
 % Plotting
 figure
 mesh(ffts(:, 1:points_by_sample / 2))
 figure
-imagesc(log(ffts(:, 1:points_by_sample / 2)));
+imagesc(ffts(:, 1:points_by_sample / 2));
 rotate3d on
 
 

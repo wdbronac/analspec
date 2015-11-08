@@ -53,11 +53,41 @@ fft_frequencies = frequence / 2 * linspace(0, 1, points_by_sample / 2);
 
 % Plotting
 figure
-mesh(ffts(:, 1:points_by_sample / 2))
+mesh(log(ffts(:, 1:points_by_sample / 2))) % ecrit par will:j'ai rajouté le log ici, je ne sais pas si tu l'avais enlevé ou mis à un autre endroit ? 
 figure
-imagesc(ffts(:, 1:points_by_sample / 2));
+imagesc(log(ffts(:, 1:points_by_sample / 2))); % ecrit par will:j'ai rajouté le log ici, je ne sais pas si tu l'avais enlevé ou mis à un autre endroit ?
 rotate3d on
 
+
+
+
+
+%-------------------------------WITH LEVINSONDURBIN------------------------------------------
+
+pp = 100;
+for i = 1:nb_samples
+[aa, sigma2, ref, ff, mydsp] = mylevinsondurbin (samples(i, :), pp, frequence);
+if i == 1
+    levinson = zeros(nb_samples, length(find(ff>0)));
+end
+levinson(i, :) = mydsp(find(ff>0));
+% keep only the positive frequencies
+fft_frequencies  = ff(find(ff>0));    
+end
+% Plotting
+figure
+mesh(log(levinson))
+figure
+imagesc(log(levinson));
+rotate3d on
+%-----------------------------------------------------------------------
+
+
+
+
+
+%%
+%clustering
 
 
 D = pdist(ffts, 'euclidean');
