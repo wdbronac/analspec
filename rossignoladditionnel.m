@@ -5,6 +5,28 @@ clear all
 
 % Chargement du signal
 [signal, frequence] = audioread('fluteircam.wav');
+
+
+%----------------AJOUT DE BRUIT-------------
+type_noise = 'weak_white_noise';
+switch type_noise
+    case 'noNoise'
+        signal = signal;
+    case 'weak_white_noise'
+        signal = awgn(signal,30);
+
+    case 'strong_white_noise'
+        signal = awgn(signal,20);
+
+    case 'weak_pink_noise'
+        signal = signal + pinknoise(length(signal))';
+
+    case 'strong_pink_noise'
+        signal = signal + 3*pinknoise(length(signal))';
+
+end
+%----------------------
+
 % Taille du signal
 signal_size = size(signal);
 signal_length = signal_size(1, 1);
@@ -34,7 +56,7 @@ for i = 1:nb_samples
 end
  
 % méthode alternative: fenêtrage et lissage des échantillons
-window = blackman(points_by_sample);
+window = blackman(points_by_sample); %%%ici tu règels la fenêtre
 for i = 1:nb_samples
     samples(i, :) = samples(i, :) .* window';
 end 
@@ -51,13 +73,19 @@ end
 fft_axis = (1:(points_by_sample / 2));
 fft_frequencies = frequence / 2 * linspace(0, 1, points_by_sample / 2);
 
+%taking only the positive frequencies of the fft
+ffts = ffts(:, 1:points_by_sample / 2);
+
 % Plotting
 figure
-mesh(log(ffts(:, 1:points_by_sample / 2))) % ecrit par will:j'ai rajouté le log ici, je ne sais pas si tu l'avais enlevé ou mis à un autre endroit ? 
+mesh(log(ffts)) % ecrit par will:j'ai rajouté le log ici, je ne sais pas si tu l'avais enlevé ou mis à un autre endroit ? 
 figure
-imagesc(log(ffts(:, 1:points_by_sample / 2))); % ecrit par will:j'ai rajouté le log ici, je ne sais pas si tu l'avais enlevé ou mis à un autre endroit ?
+imagesc(log(ffts)); % ecrit par will:j'ai rajouté le log ici, je ne sais pas si tu l'avais enlevé ou mis à un autre endroit ?
 rotate3d on
 
+% le vecteur des fréquences est fft_frequencies
+%pour plotter juste pour un échantillon, faire
+%plot(fft_frequencies,ffts(100, :)/trapz(fft_frequencies,ffts(100, :))), (on normalise par l'aire) par exemple pour le 100è échantillon
 
 
 
@@ -72,7 +100,7 @@ if i == 1
 end
 levinson(i, :) = mydsp(find(ff>0));
 % keep only the positive frequencies
-fft_frequencies  = ff(find(ff>0));    
+levinson_frequencies  = ff(find(ff>0));    
 end
 % Plotting
 figure
@@ -80,7 +108,36 @@ mesh(log(levinson))
 figure
 imagesc(log(levinson));
 rotate3d on
-%-----------------------------------------------------------------------
+
+% le vecteur des fréquences est levinson_frequencies
+%pour plotter juste pour un échantillon, faire
+%plot(levinson_frequencies,levinson(100, :)/trapz(levinson_frequencies,levinson(100, :))), (on normalise par l'aire) par exemple pour le 100è échantillon
+%pour plotter sur le même plan qu'un autre faire subplot et bien garder les
+%vecteurs XXX_frequencies en abscisse de chaque plot
+
+%--------------------------WITH PERIODOGRAM---------------------------------------------
+
+% FFT des échantillons
+perio = zeros(nb_samples, points_by_sample);
+for i = 1:nb_samples
+    perio(i, :) = abs(fft(samples(i, :))).^2;
+end
+perio_axis = (1:(points_by_sample / 2));
+perio_frequencies = frequence / 2 * linspace(0, 1, points_by_sample / 2);
+
+% Plotting
+figure
+mesh(log(ffts(:, 1:points_by_sample / 2))) % ecrit par will:j'ai rajouté le log ici, je ne sais pas si tu l'avais enlevé ou mis à un autre endroit ? 
+figure
+imagesc(log(ffts(:, 1:points_by_sample / 2))); % ecrit par will:j'ai rajouté le log ici, je ne sais pas si tu l'avais enlevé ou mis à un autre endroit ?
+rotate3d on
+
+
+
+
+
+
+
 
 
 
@@ -90,7 +147,10 @@ rotate3d on
 %clustering
 
 
+
+%ici changer ffts en ce qu'on veut (levinson, periodogram)
 D = pdist(ffts, 'euclidean');
+
 Z = linkage(D);
 
 figure
@@ -171,4 +231,14 @@ plot(signal/max(signal), 'b');
 %    pp = 10*i;
 %    [aa, sigma2, ref, ff, mydsp]= mylevinsondurbin(y, pp, Fs);
 %end
+
+
+
+
+
+
+%aide pour le tracé des bonnes courbes: 
+
+
+
 
