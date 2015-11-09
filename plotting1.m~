@@ -113,10 +113,10 @@ end
 % mesh(log(levinson))
 % figure
 imagesc(log(levinson));
-title(strcat('DSP par Levinson, ', window_type, ', ',type_noise))
-% xaxis('Frequency')
-% yaxis('Sample')
-% axis( [0 frequence/2 1 length(levinson(:,1))])
+title(strcat('DSP par Levinson,', window_type, ',',type_noise))
+xaxis('Frequency')
+yaxis('Sample')
+axis( [0 frequence/2 1 length(
 rotate3d on
 
 % le vecteur des fréquences est levinson_frequencies
@@ -141,60 +141,6 @@ mesh(log(ffts(:, 1:points_by_sample / 2))) % ecrit par will:j'ai rajouté le log 
 figure
 imagesc(log(ffts(:, 1:points_by_sample / 2))); % ecrit par will:j'ai rajouté le log ici, je ne sais pas si tu l'avais enlevé ou mis à un autre endroit ?
 rotate3d on
-
-
-
-%----------------------WITH BURG---------------------
-
-
- case 'burg'
-pp = 100;
-for i = 1:nb_samples
-[aa, sigma2, ref, ff, mydsp] = myburg(samples(i, :), pp, frequence);
-if i == 1
-    burg = zeros(nb_samples, length(find(ff>0)));
-end
-burg(i, :) = mydsp(find(ff>0));
-% keep only the positive frequencies
-burg_frequencies  = ff(find(ff>0));    
-end
-% Plotting
-% figure
-% mesh(log(burg))
-% figure
-figure('units','normalized','outerposition',[0 0 1 1])
-imagesc(log(burg));
-title(strcat('DSP par burg, ', window_type, ', ',type_noise))
-% xaxis('Frequency')
-% yaxis('Sample')
-% axis( [0 frequence/2 1 length(burg(:,1))])
-rotate3d on
-
-% le vecteur des fréquences est burg_frequencies
-%pour plotter juste pour un échantillon, faire
-%plot(burg_frequencies,burg(100, :)/trapz(burg_frequencies,burg(100, :))), (on normalise par l'aire) par exemple pour le 100è échantillon
-%pour plotter sur le même plan qu'un autre faire subplot et bien garder les
-%vecteurs XXX_frequencies en abscisse de chaque plot
-
-
-
-
-
-
-
-%-----------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
 
 end
 

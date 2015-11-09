@@ -5,10 +5,14 @@ clear all
 
 % Chargement du signal
 [signal, frequence] = audioread('fluteircam.wav');
+type_noise = 'noNoise';
+estimate_type = 'levinson';
+window_type = 'blackman';
+
+
 
 
 %----------------AJOUT DE BRUIT-------------
-type_noise = 'weak_white_noise';
 switch type_noise
     case 'noNoise'
         signal = signal;
@@ -56,13 +60,25 @@ for i = 1:nb_samples
 end
  
 % méthode alternative: fenêtrage et lissage des échantillons
+
+
+switch window_type
+    case 'blackman'
 window = blackman(points_by_sample); %%%ici tu règels la fenêtre
+    case 'hamming'
+        window = hamming(points_by_sample); %%%ici tu règels la fenêtre
+    case 'hanning'
+        window = hanning(points_by_sample); %%%ici tu règels la fenêtre
+    case 'bartlett'
+        window = bartlett(points_by_sample); %%%ici tu règels la fenêtre
+
 for i = 1:nb_samples
     samples(i, :) = samples(i, :) .* window';
 end 
  
 
-
+switch estimate_type
+    case 'fft'
 
 % -------------------------- FFT -------------------------
 % FFT des échantillons
@@ -91,7 +107,7 @@ rotate3d on
 
 
 %-------------------------------WITH LEVINSONDURBIN------------------------------------------
-
+    case 'levinson'
 pp = 100;
 for i = 1:nb_samples
 [aa, sigma2, ref, ff, mydsp] = mylevinsondurbin (samples(i, :), pp, frequence);
@@ -116,7 +132,7 @@ rotate3d on
 %vecteurs XXX_frequencies en abscisse de chaque plot
 
 %--------------------------WITH PERIODOGRAM---------------------------------------------
-
+    case 'periodogram'
 % FFT des échantillons
 perio = zeros(nb_samples, points_by_sample);
 for i = 1:nb_samples
@@ -132,7 +148,7 @@ figure
 imagesc(log(ffts(:, 1:points_by_sample / 2))); % ecrit par will:j'ai rajouté le log ici, je ne sais pas si tu l'avais enlevé ou mis à un autre endroit ?
 rotate3d on
 
-
+end
 
 
 

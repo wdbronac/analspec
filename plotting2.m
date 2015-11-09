@@ -8,8 +8,22 @@ clear all
 [signal, frequence] = audioread('fluteircam.wav');
 
 type_noise = 'noNoise';
-estimate_type = 'levinson';
-window_type = 'hanning';
+%'noNoise'
+%'weak_white_noise'
+%'strong_white_noise'
+%'weak_pink_noise'
+%'strong_pink_noise'
+
+estimate_type = 'burg';
+%fft
+%levinson
+%periodogram
+%burg
+window_type = 'blackman';
+%blackman
+%hamming
+%hanning
+%bartlett
 
 
 
